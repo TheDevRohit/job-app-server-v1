@@ -51,6 +51,7 @@ exports.signup = async (req, res) => {
     const user = new User({
       name,
       mobile,
+      image : "https://cdn-icons-png.flaticon.com/512/149/149071.png",
       password: hashedPassword,
       userType: userType || 'user', // default user
     });
