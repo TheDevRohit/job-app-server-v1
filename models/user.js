@@ -4,6 +4,7 @@ const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   mobile: { type: String, required: true, unique: true },
   password: { type: String },
+  image : {type : String , default : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'},
   userType: { type: String, enum: ['admin', 'jobposter', 'user'], default: 'user' },
   savedJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
   favoriteJobs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Job' }],
