@@ -57,12 +57,13 @@ exports.signup = async (req, res) => {
 
     await user.save();
 
-    const token = generateToken(user);
+    const { password: userPassword, ...userWithoutPassword } = user.toObject();
 
     res.status(201).json({
       token,
-      user: { id: user._id, name: user.name, mobile: user.mobile, userType: user.userType },
+      user: userWithoutPassword,
     });
+
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
