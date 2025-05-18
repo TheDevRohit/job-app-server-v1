@@ -25,6 +25,7 @@ const JobSchema = new mongoose.Schema({
   experience : {type : String},
   applyBy : {type : Date},
   language : {type : String},
+  isNew : {type : Boolean , default : true},
   // add any other fields like experience, education, etc.
 }, { timestamps: true });
 
