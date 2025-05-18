@@ -33,7 +33,7 @@ function generateToken(user) {
 
 exports.signup = async (req, res) => {
   try {
-    const { name, mobile, password, userType } = req.body;
+    const { name, mobile, password, userType , skill } = req.body;
     if (!name || !mobile || (!password && !req.body.otp)) {
       return res.status(400).json({ message: 'Please provide required fields' });
     }
@@ -51,6 +51,7 @@ exports.signup = async (req, res) => {
     const user = new User({
       name,
       mobile,
+      skills : skill,
       image : "https://cdn-icons-png.flaticon.com/512/149/149071.png",
       password: hashedPassword,
       userType: userType || 'user', // default user
@@ -62,7 +63,7 @@ exports.signup = async (req, res) => {
      
     const { password: userPassword, ...userWithoutPassword } = user.toObject();
 
-      res.status(201).json({
+    res.status(201).json({
         token,
         user: userWithoutPassword,
       });
