@@ -1,8 +1,6 @@
 const Job = require('../models/job');
 const User = require('../models/user');
 
-// Create a new job (only jobposter/admin)
-const Job = require('../models/job'); // adjust path if needed
 
 exports.createJob = async (req, res) => {
   try {
