@@ -14,6 +14,7 @@ app.use(express.json()); // Parse JSON body
 // Import routes
 const authRoutes = require('./routes/auth_route');
 const jobRoutes = require('./routes/job_route');
+const notificationRoutes = require('./routes/notification_route');
 // const userRoutes = require('./routes/user'); // If you have user routes
 
 // Connect to MongoDB
@@ -30,6 +31,7 @@ mongoose.connect(process.env.MONGO_URI, {
 // Use routes
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
+app.use('/api/notifications' , notificationRoutes)
 // app.use('/api/users', userRoutes);
 
 // Default route
