@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const notificationController = require('../controllers/notification_controller');
-const authMiddleware = require('..../middleware/auth_middlewars') // Assuming you have this
+const authMiddleware = require('../middlewares/auth_middlewars') // Assuming you have this
 
 // Authenticated routes
 router.use(authMiddleware);
