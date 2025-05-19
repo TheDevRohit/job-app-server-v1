@@ -125,7 +125,7 @@ exports.getJobById = async (req, res) => {
 exports.getJobsByUser = async (req, res) => {
   try {
     const jobs = await Job.find({ postedBy: req.user.id });
-    res.json(jobs);
+    res.json({message : "list of my jobs", jobs:jobs});
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -236,7 +236,7 @@ exports.applyJob = async (req, res) => {
 exports.getAppliedJobsByUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate('appliedJobs');
-    res.json(user.appliedJobs);
+    res.json({message : "list of jobs", jobs: user.appliedJobs});
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -270,7 +270,7 @@ exports.toggleFavoriteJob = async (req, res) => {
 exports.getFavoriteJobsByUser = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).populate('favoriteJobs');
-    res.json(user.favoriteJobs);
+    res.json({message : "list of jobs", jobs: user.favoriteJobs});
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
