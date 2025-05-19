@@ -6,6 +6,7 @@ const twilio = require('twilio');
 const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
+const { createNotification } = require('./notification_controller');
 
 const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
 
@@ -58,11 +59,17 @@ exports.signup = async (req, res) => {
     });
 
     await user.save();
+    const welcomeNotification = new Notification({
+      title: `Hii ${user.name} Welcome to Hirealis}!`, // Replace with your app name
+      message: 'Welcome to our community! Explore opportunities and grow your career with us.',
+      targetUsers: [user._id],
+      isGlobal: false,
+    });
 
+    await welcomeNotification.save();
     const token = generateToken(user);
      
     const { password: userPassword, ...userWithoutPassword } = user.toObject();
-
     res.status(201).json({
         message : "Logged in successfully",
         token,
