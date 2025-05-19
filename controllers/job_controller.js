@@ -102,7 +102,7 @@ exports.createJob = async (req, res) => {
 exports.getAllJobs = async (req, res) => {
   try {
     const jobs = await Job.find({ status: 'open' }).populate('postedBy', 'name mobile');
-    res.json(jobs);
+    res.json({message : "list of jobs", jobs:jobs});
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
