@@ -2,6 +2,8 @@ const Job = require('../models/job');
 const User = require('../models/user');
 
 // Create a new job (only jobposter/admin)
+const Job = require('../models/job'); // adjust path if needed
+
 exports.createJob = async (req, res) => {
   try {
     const {
@@ -18,14 +20,25 @@ exports.createJob = async (req, res) => {
       companyWebsite,
       companySize,
       companyType,
+      industry,
       lookingFor,
       applyBy,
+      deadline,
       language,
       aboutRole,
       aboutCompany,
       benifits,
+      perks,
       url,
-      hrEmail
+      applicationLink,
+      hrEmail,
+      remote,
+      locationType,
+      jobLevel,
+      duration,
+      rolesAndRes,
+      openings,
+      tags,
     } = req.body;
 
     // Validate required fields
@@ -52,20 +65,34 @@ exports.createJob = async (req, res) => {
       companyWebsite,
       companySize,
       companyType,
+      industry,
       lookingFor,
       applyBy,
+      deadline,
       language,
       aboutRole,
       aboutCompany,
       benifits,
+      perks,
       url,
+      applicationLink,
       hrEmail,
+      remote,
+      locationType,
+      jobLevel,
+      duration,
+      rolesAndRes,
+      openings,
+      tags,
       postedBy: req.user.id,
       status: 'open',
     });
 
     await job.save();
-    res.status(201).json(job);
+    res.status(201).json({
+      message: "Job created successfully",
+      job,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });
