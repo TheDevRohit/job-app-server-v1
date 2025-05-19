@@ -64,6 +64,7 @@ exports.signup = async (req, res) => {
     const { password: userPassword, ...userWithoutPassword } = user.toObject();
 
     res.status(201).json({
+        message : "Logged in successfully",
         token,
         user: userWithoutPassword,
       });
@@ -108,6 +109,7 @@ exports.login = async (req, res) => {
     const { password: userPassword, ...userWithoutPassword } = user.toObject();
 
     res.status(201).json({
+        message : "Logged in successfully",
         token,
         user: userWithoutPassword,
       });
