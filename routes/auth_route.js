@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/auth_controller');
-
+const auth = require('../middlewares/auth_middlewars');
 // Signup with password or phone
 router.post('/signup', userController.signup);
 
@@ -21,7 +21,7 @@ router.post('/forgot-password', userController.forgotPassword);
 router.put('/update-profile', userController.updateProfile);
 
 // Upload Resume (auth required)
-router.post('/upload-resume', userController.uploadResume);
+router.post('/upload-resume', auth , userController.uploadResume);
 
 // Get Resume (auth required)
 router.get('/get-resume', userController.getResume);
