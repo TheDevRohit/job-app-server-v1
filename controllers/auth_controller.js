@@ -60,7 +60,7 @@ exports.signup = async (req, res) => {
 
     await user.save();
     const welcomeNotification = new Notification({
-      title: `Hii ${user.name} Welcome to Hirealis}!`, // Replace with your app name
+      title: `Hii ${user.name.toUpperCase} Welcome to Hirealis!`, // Replace with your app name
       message: 'Welcome to our community! Explore opportunities and grow your career with us.',
       targetUsers: [user._id],
       isGlobal: false,
