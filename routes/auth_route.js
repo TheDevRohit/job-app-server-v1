@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/auth_controller');
 const auth = require('../middlewares/auth_middlewars');
+
 // Signup with password or phone
 router.post('/signup', userController.signup);
 
@@ -18,16 +19,14 @@ router.post('/verify-otp', userController.verifyOtp);
 router.post('/forgot-password', userController.forgotPassword);
 
 // Update Profile (auth required)
-router.put('/update-profile', userController.updateProfile);
+router.put('/update-profile', auth ,userController.updateProfile);
 
 // Upload Resume (auth required)
 router.post('/upload-resume', auth , userController.uploadResume);
 
 // Get Resume (auth required)
-router.get('/get-resume', userController.getResume);
+router.get('/get-resume',auth ,userController.getResume);
 
-// Apply for job (auth required)
-router.post('/apply-job', userController.applyJob);
 
 // Favorite Jobs CRUD
 router.post('/favorite-job/:jobId', userController.addFavorite);

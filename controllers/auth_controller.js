@@ -199,18 +199,32 @@ exports.resetPassword = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
   try {
-    const { id } = req.user; // set by auth middleware decoding JWT
-    const { name, email } = req.body;
+    const id  = req.user.id; // Set by auth middleware from JWT
+    const updates = req.body;
 
-    const updated = await User.findByIdAndUpdate(
+    // Optionally handle profile image or resume if you're uploading files
+    if (req.file) {
+      updates.image = req.file.path; // or cloud URL
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
       id,
-      { name, email },
+      { $set: updates },
       { new: true, runValidators: true }
     );
 
-    res.json({ user: updated });
+    if (!updatedUser) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const { password, ...userWithoutPassword } = updatedUser.toObject();
+
+    res.status(200).json({
+      message: 'Profile updated successfully',
+      user: userWithoutPassword,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Failed to update', error: error.message });
+    res.status(500).json({ message: 'Failed to update profile', error: error.message });
   }
 };
 

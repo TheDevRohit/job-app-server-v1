@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
+  email : {type : String},
   mobile: { type: String, required: true, unique: true },
   password: { type: String },
   image : {type : String , default : 'https://cdn-icons-png.flaticon.com/512/149/149071.png'},
@@ -13,6 +14,8 @@ const userSchema = new mongoose.Schema({
   openToWork : {type : Boolean , default : true},
   instagram : {type : String},
   twitter : {type : String},
+  jobTitle : {type : String},
+  preferredLocation : {type : String},
   github : {type : String},
   linkedin : {type : String},
   portfolio : {type : String},
