@@ -7,7 +7,7 @@ const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
 const { createNotification } = require('./notification_controller');
-const {Notification} = require('../models/notitfication')
+const Notification = require('../models/notification')
 const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
 
 // For demo: store OTPs here, replace with Redis or DB in prod
