@@ -18,6 +18,9 @@ router.post('/verify-otp', userController.verifyOtp);
 // Forgot Password
 router.post('/forgot-password', userController.forgotPassword);
 
+router.put('/change-password' , auth , userController.changePassword);
+
+
 // Update Profile (auth required)
 router.put('/update-profile', auth ,userController.updateProfile);
 
