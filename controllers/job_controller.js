@@ -99,14 +99,45 @@ exports.createJob = async (req, res) => {
 
 
 // Get all open jobs
+// Get all open jobs with optional filters
 exports.getAllJobs = async (req, res) => {
   try {
-    const jobs = await Job.find({ status: 'open' }).populate('postedBy', 'name mobile');
-    res.json({message : "list of jobs", jobs:jobs});
+    const { title, location, jobType, search } = req.query;
+
+    const filter = { status: 'open' };
+
+    if (title) {
+      filter.title = { $regex: title, $options: 'i' };
+    }
+
+    if (location) {
+      filter.location = { $regex: location, $options: 'i' };
+    }
+
+    if (jobType) {
+      filter.jobType = jobType;
+    }
+
+    // General search in title or description
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+      ];
+    }
+
+    const jobs = await Job.find(filter).populate('postedBy', 'name mobile');
+
+    res.json({
+      message: "Filtered list of jobs",
+      jobs,
+    });
   } catch (error) {
+    console.error(error);
     res.status(500).json({ message: 'Server error' });
   }
 };
+
 
 // Get job by id
 exports.getJobById = async (req, res) => {
