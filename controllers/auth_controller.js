@@ -35,8 +35,8 @@ function generateToken(user) {
 
 exports.signup = async (req, res) => {
   try {
-    const { name, mobile, password, userType , skill } = req.body;
-    if (!name || !mobile || (!password && !req.body.otp)) {
+    const { name, mobile, password, userType , skill , email } = req.body;
+    if (!name || !mobile || !email (!password && !req.body.otp)) {
       return res.status(400).json({ message: 'Please provide required fields' });
     }
 
@@ -53,6 +53,7 @@ exports.signup = async (req, res) => {
     const user = new User({
       name,
       mobile,
+      email,
       skills : skill,
       image : "https://cdn-icons-png.flaticon.com/512/149/149071.png",
       password: hashedPassword,
