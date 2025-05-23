@@ -15,6 +15,13 @@ router.post('/send-otp', userController.sendOTP);
 // Verify OTP
 router.post('/verify-otp', userController.verifyOtp);
 
+// send email otp
+router.post('/send-email-otp' , userController.sendEmailOTP);
+
+
+// verify email otp
+router.post('/verify-email-otp' , userController.verifyEmailOTP);
+
 // Forgot Password
 router.post('/forgot-password', userController.forgotPassword);
 

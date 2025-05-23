@@ -8,6 +8,7 @@ const path = require('path');
 const crypto = require('crypto');
 const { createNotification } = require('./notification_controller');
 const Notification = require('../models/notification')
+const nodemailer = require('nodemailer');
 const client = new twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN);
 
 // For demo: store OTPs here, replace with Redis or DB in prod
@@ -145,6 +146,85 @@ exports.sendOTP = async (req, res) => {
     res.status(500).json({ message: 'Failed to send OTP', error: error.message });
   }
 };
+
+
+
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: "thedevrohit@gmail.com",
+        pass: "fyitnuzbzoytnutb"
+    }
+});
+
+const sendEmailOTPHelper = async (to, otp) => {
+   try {
+     
+  console.log("email = ",to);
+
+  console.log("otp = ",otp);
+
+   await transporter.sendMail({
+            from: "thedevrohit@gmail.com",
+            to: to,
+            subject: 'Email Verification OTP',
+            html: `<p>Your OTP for verification is: <strong>${otp}</strong></p>`
+        });
+   return true 
+   }catch(e){
+    console.log("erro  = ",e);
+   }
+     
+};
+
+exports.sendEmailOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ message: 'Email required' });
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await sendEmailOTPHelper(email, otp);
+
+    otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 };
+   
+    res.json({ message: 'OTP sent to email' });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to send OTP', error: error.message });
+  }
+};
+
+exports.verifyEmailOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ message: 'Email and OTP are required' });
+    }
+
+    const record = otpStore[email];
+    if (!record) {
+      return res.status(400).json({ message: 'No OTP sent or expired' });
+    }
+
+    if (Date.now() > record.expires) {
+      delete otpStore[email];
+      return res.status(400).json({ message: 'OTP expired' });
+    }
+
+    if (record.otp !== otp) {
+      return res.status(400).json({ message: 'Invalid OTP' });
+    }
+
+    // OTP is valid
+    delete otpStore[email]; // Clear OTP after successful verification
+
+    res.status(200).json({ message: 'Email verified successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Verification failed', error: error.message });
+  }
+};
+
 
 exports.forgotPassword = async (req, res) => {
   try {
