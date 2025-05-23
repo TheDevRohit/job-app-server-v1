@@ -62,7 +62,7 @@ exports.signup = async (req, res) => {
 
     await user.save();
     const welcomeNotification = new Notification({
-      title: `Hii ${user.name.toUpperCase} Welcome to Hirealis!`, // Replace with your app name
+      title: `Hii ${user.name} Welcome to Hirealis!`, // Replace with your app name
       message: 'Welcome to our community! Explore opportunities and grow your career with us.',
       targetUsers: [user._id],
       isGlobal: false,
@@ -177,6 +177,53 @@ const sendEmailOTPHelper = async (to, otp) => {
    }
      
 };
+
+
+exports.sendMailToHR = async (req, res) => {
+  try {
+    const { hrEmail, subject, description } = req.body;
+    const userId = req.user.id;
+
+    if (!hrEmail || !subject || !description) {
+      return res.status(400).json({ success: false, message: "All fields are required (hrEmail, subject, description)" });
+    }
+
+    // Get user email from userId
+    const user = await User.findById(userId);
+    if (!user || !user.email) {
+      return res.status(404).json({ success: false, message: "User not found or email not present" });
+    }
+
+    const fromEmail = user.email;
+
+    // Configure nodemailer transport
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: "thedevrohit@gmail.com",
+        pass: "fyitnuzbzoytnutb"
+      },
+    });
+
+    // Send email to HR
+    await transporter.sendMail({
+      from: `"${user.name}" <${fromEmail}>`,
+      to: hrEmail,
+      subject,
+      html: `<p><strong>From:</strong> ${fromEmail}</p>
+             <p><strong>Subject:</strong> ${subject}</p>
+             <p><strong>Message:</strong><br>${description}</p>`,
+    });
+
+    return res.status(200).json({ success: true, message: "Mail sent to HR successfully" });
+  } catch (error) {
+    console.error("Error in sendMailToHR:", error);
+    return res.status(500).json({ success: false, message: "Failed to send email to HR", error: error.message });
+  }
+};
+
+
+
 
 exports.sendEmailOTP = async (req, res) => {
   try {
