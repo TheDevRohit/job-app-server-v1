@@ -36,7 +36,7 @@ function generateToken(user) {
 exports.signup = async (req, res) => {
   try {
     const { name, mobile, password, userType , skill , email } = req.body;
-    if (!name || !mobile || !email (!password && !req.body.otp)) {
+    if (!name || !mobile || !email || !password) {
       return res.status(400).json({ message: 'Please provide required fields' });
     }
 
