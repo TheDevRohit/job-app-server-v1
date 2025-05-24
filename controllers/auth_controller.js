@@ -158,25 +158,7 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-const sendEmailOTPHelper = async (to, otp) => {
-   try {
-     
-  console.log("email = ",to);
 
-  console.log("otp = ",otp);
-
-   await transporter.sendMail({
-            from: "thedevrohit@gmail.com",
-            to: to,
-            subject: 'Email Verification OTP',
-            html: `<p>Your OTP for verification is: <strong>${otp}</strong></p>`
-        });
-   return true 
-   }catch(e){
-    console.log("erro  = ",e);
-   }
-     
-};
 
 
 exports.sendMailToHR = async (req, res) => {
@@ -224,10 +206,42 @@ exports.sendMailToHR = async (req, res) => {
 
     await transporter.sendMail({
       from: `"Hirealis Applicant" <${fromEmail}>`,
-      to: hrEmail,
+      to: from,
       subject,
       html: htmlContent,
     });
+    
+    // Email to Applicant (User)
+    const htmlContentUser = `
+      <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
+        <h2>🎉 Congratulations!</h2>
+        <p>Dear candidate,</p>
+        <p>You have <strong>successfully applied</strong> for the job position via <strong>Hirealis</strong>.</p>
+        <p>Your application has been sent to the respective HR. We wish you the best of luck in your job journey!</p>
+
+        <p>If you have attached your resume, it has been shared as part of the application.</p>
+
+        <p style="margin-top: 20px;">Stay connected with Hirealis for more job opportunities tailored just for you.</p>
+
+        <div style="text-align: center; margin: 30px 0;">
+          <img src="${logoUrl}" alt="Hirealis Logo" width="120" style="border-radius: 8px;" />
+        </div>
+
+        <hr />
+        <p style="font-size: 13px; color: #777; text-align: center;">
+          This email was sent to confirm your job application on Hirealis.
+        </p>
+      </div>
+    `;
+
+    // Send confirmation to user
+    await transporter.sendMail({
+      from: `"Hirealis Team" <thedevrohit@gmail.com>`,
+      to: from,
+      subject: "✅ Application Received – Hirealis",
+      html: htmlContentUser,
+    });
+
 
     return res.status(200).json({ success: true, message: "Mail sent to HR successfully" });
   } catch (error) {
@@ -236,7 +250,52 @@ exports.sendMailToHR = async (req, res) => {
   }
 };
 
+const sendEmailOTPHelper = async (to, otp) => {
+  try {
+    console.log("email = ", to);
+    console.log("otp = ", otp);
 
+    await transporter.sendMail({
+      from: '"Hirealis Support" <thedevrohit@gmail.com>',
+      to: to,
+      subject: 'Your OTP Code - Hirealis',
+      html: `
+      <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
+        <div style="max-width: 600px; margin: auto; background-color: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+          <div style="background-color: #673ab7; padding: 20px; text-align: center;">
+            <img src="https://hirealis-web.vercel.app/assets/logo-BEQSbQOd.png" alt="Hirealis Logo" style="height: 50px;" />
+            <h2 style="color: #fff; margin-top: 10px;">OTP Verification</h2>
+          </div>
+          <div style="padding: 30px; text-align: center;">
+            <p style="font-size: 16px; color: #333;">
+              Hello,
+              <br /><br />
+              You recently requested to verify your email address with <strong>Hirealis</strong>.
+              Please use the following OTP to proceed:
+            </p>
+            <h1 style="font-size: 32px; color: #673ab7; margin: 20px 0;">${otp}</h1>
+            <p style="font-size: 14px; color: #555;">
+              This OTP is valid for the next <strong>5 minutes</strong>.
+              <br />
+              If you did not request this, you can safely ignore this email.
+            </p>
+          </div>
+          <div style="background-color: #f1f1f1; padding: 20px; text-align: center;">
+            <p style="font-size: 12px; color: #999;">
+              Need help? Contact us at <a href="mailto:support@hirealis.com">support@hirealis.com</a><br />
+              &copy; ${new Date().getFullYear()} Hirealis. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </div>
+      `
+    });
+
+    return true;
+  } catch (e) {
+    console.log("error = ", e);
+  }
+};
 
 
 exports.sendEmailOTP = async (req, res) => {
@@ -287,29 +346,27 @@ exports.verifyEmailOTP = async (req, res) => {
   }
 };
 
-
 exports.forgotPassword = async (req, res) => {
   try {
-    const { mobile } = req.body;
-    if (!mobile) return res.status(400).json({ message: 'Mobile required' });
+    const { email, newPassword } = req.body;
 
-    const user = await User.findOne({ mobile });
-    if (!user) return res.status(400).json({ message: 'Mobile not registered' });
+    if (!email || !newPassword) {
+      return res.status(400).json({ message: 'Email and new password are required' });
+    }
 
-    // Create reset token
-    const resetToken = crypto.randomBytes(20).toString('hex');
-    resetTokenStore[mobile] = { token: resetToken, expires: Date.now() + 15 * 60 * 1000 }; // 15 min
+    const user = await User.findOne({ email });
 
-    // Send reset token as OTP for simplicity, you can send email or SMS here
-    await client.messages.create({
-      body: `Your password reset code is ${resetToken}`,
-      from: process.env.TWILIO_PHONE_NUMBER,
-      to: mobile,
-    });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
 
-    res.json({ message: 'Reset token sent' });
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save();
+
+    return res.json({ message: 'Password reset successfully' });
   } catch (error) {
-    res.status(500).json({ message: 'Failed', error: error.message });
+    return res.status(500).json({ message: 'Error updating password', error: error.message });
   }
 };
 
