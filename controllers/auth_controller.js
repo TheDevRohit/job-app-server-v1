@@ -181,22 +181,17 @@ const sendEmailOTPHelper = async (to, otp) => {
 
 exports.sendMailToHR = async (req, res) => {
   try {
-    const { hrEmail, subject, description } = req.body;
-    const userId = req.user.id;
+    const { hrEmail, subject, description, from, resumeUrl } = req.body;
 
     if (!hrEmail || !subject || !description) {
-      return res.status(400).json({ success: false, message: "All fields are required (hrEmail, subject, description)" });
+      return res.status(400).json({
+        success: false,
+        message: "All fields are required (hrEmail, subject, description)"
+      });
     }
 
-    // Get user email from userId
-    const user = await User.findById(userId);
-    if (!user || !user.email) {
-      return res.status(404).json({ success: false, message: "User not found or email not present" });
-    }
+    const fromEmail = from;
 
-    const fromEmail = user.email;
-
-    // Configure nodemailer transport
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
@@ -205,14 +200,33 @@ exports.sendMailToHR = async (req, res) => {
       },
     });
 
-    // Send email to HR
+    const logoUrl = "https://hirealis-web.vercel.app/assets/logo-BEQSbQOd.png";
+
+    const htmlContent = `
+      <div style="font-family: Arial, sans-serif; padding: 20px;">
+        <p><strong>From:</strong> ${fromEmail}</p>
+        <p><strong>Subject:</strong> ${subject}</p>
+        <p><strong>Message:</strong><br>${description}</p>
+
+        ${resumeUrl ? `
+        <p><strong>Resume:</strong> <a href="${resumeUrl}" target="_blank" style="color: #1a73e8;">View Resume</a></p>
+        ` : ''}
+
+        <hr style="margin: 30px 0;" />
+        <p style="text-align: center; font-size: 14px; color: #555;">
+          Applied via <strong>Hirealis</strong> job platform
+        </p>
+        <div style="text-align: center; margin-top: 10px;">
+          <img src="${logoUrl}" alt="Hirealis Logo" width="100" style="border-radius: 8px;" />
+        </div>
+      </div>
+    `;
+
     await transporter.sendMail({
-      from: `"${user.name}" <${fromEmail}>`,
+      from: `"Hirealis Applicant" <${fromEmail}>`,
       to: hrEmail,
       subject,
-      html: `<p><strong>From:</strong> ${fromEmail}</p>
-             <p><strong>Subject:</strong> ${subject}</p>
-             <p><strong>Message:</strong><br>${description}</p>`,
+      html: htmlContent,
     });
 
     return res.status(200).json({ success: true, message: "Mail sent to HR successfully" });

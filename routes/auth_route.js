@@ -34,7 +34,7 @@ router.put('/update-profile', auth ,userController.updateProfile);
 // Upload Resume (auth required)
 router.post('/upload-resume', auth , userController.uploadResume);
 
-router.post('/send-mail-hr', auth , userController.sendMailToHR);
+router.post('/send-mail-hr' , userController.sendMailToHR);
 
 
 // Get Resume (auth required)
