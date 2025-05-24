@@ -84,48 +84,54 @@ exports.signup = async (req, res) => {
 
 exports.login = async (req, res) => {
   try {
-    const { mobile, password, otp } = req.body;
-    if (!mobile || (!password && !otp)) {
-      return res.status(400).json({ message: 'Provide mobile and password or OTP' });
+    const { email, mobile, password, otp } = req.body;
+
+    if ((!email && !mobile) || (!password && !otp)) {
+      return res.status(400).json({ message: 'Provide email/mobile and password or OTP' });
     }
 
-    const user = await User.findOne({ mobile });
+    const query = email ? { email } : { mobile };
+    const user = await User.findOne(query);
+
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    // Verify password
     if (password) {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(400).json({ message: 'Invalid credentials' });
       }
-    } else if (otp) {
-      // Verify OTP
-      const record = otpStore[mobile];
+    }
+    // Verify OTP
+    else if (otp) {
+      const identifier = mobile || user.mobile; // use mobile from req or user record
+      const record = otpStore[identifier];
       if (!record) return res.status(400).json({ message: 'No OTP sent' });
       if (Date.now() > record.expires) {
-        delete otpStore[mobile];
+        delete otpStore[identifier];
         return res.status(400).json({ message: 'OTP expired' });
       }
-      if (record.otp !== otp) return res.status(400).json({ message: 'Invalid OTP' });
-      delete otpStore[mobile];
-    } else {
-      return res.status(400).json({ message: 'Password or OTP required' });
+      if (record.otp !== otp) {
+        return res.status(400).json({ message: 'Invalid OTP' });
+      }
+      delete otpStore[identifier];
     }
 
     const token = generateToken(user);
+    const { password: pwd, ...userWithoutPassword } = user.toObject();
 
-    const { password: userPassword, ...userWithoutPassword } = user.toObject();
-
-    res.status(201).json({
-        message : "Logged in successfully",
-        token,
-        user: userWithoutPassword,
-      });
+    res.status(200).json({
+      message: 'Logged in successfully',
+      token,
+      user: userWithoutPassword,
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
 
 exports.sendOTP = async (req, res) => {
   try {
