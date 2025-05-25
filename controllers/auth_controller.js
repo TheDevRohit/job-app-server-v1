@@ -173,7 +173,7 @@ exports.signup = async (req, res) => {
     </div>
   `,
     };
-    await transporter.sendMail(supportMail);
+    await transporter.sendMail(userMail);
 
     await user.save();
     const welcomeNotification = new Notification({
