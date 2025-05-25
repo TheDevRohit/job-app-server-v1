@@ -40,9 +40,11 @@ exports.signup = async (req, res) => {
       return res.status(400).json({ message: 'Please provide required fields' });
     }
 
-    const existingUser = await User.findOne({ mobile });
+   const existingUser = await User.findOne({ $or: [{ email }, { mobile }] });
+
     if (existingUser) {
-      return res.status(400).json({ message: 'Mobile already registered' });
+      let field = existingUser.email === email ? 'Email' : 'Mobile number';
+      return res.status(400).json({ message: `${field} already registered` });
     }
 
     let hashedPassword = '';

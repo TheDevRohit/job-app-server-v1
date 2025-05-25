@@ -126,7 +126,10 @@ exports.getAllJobs = async (req, res) => {
       ];
     }
 
-    const jobs = await Job.find(filter).populate('postedBy', 'name mobile');
+    const jobs = await Job.find(filter)
+    .sort({ createdAt: -1 }) // Sort by newest first
+    .populate('postedBy', 'name mobile');
+
 
     res.json({
       message: "Filtered list of jobs",
