@@ -32,6 +32,75 @@ function generateToken(user) {
     expiresIn: '7d',
   });
 }
+const logoUrl = "https://hirealis-web.vercel.app/assets/logo-BEQSbQOd.png";
+
+
+
+exports.support =  async (req, res) => {
+  const { name, email, message } = req.body;
+
+  
+
+  const supportMail = {
+    from: email,
+    to: 
+    'thedevrohit@gmail.com',
+    subject: `Support Query from ${name}`,
+    html: `
+      <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 12px; padding: 24px;">
+        <img src=${logoUrl} alt="App Logo" style="height: 48px; margin-bottom: 16px;" />
+        <h2 style="color: #333;">📩 New Support Message Received</h2>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Message:</strong></p>
+        <div style="background: #f9f9f9; padding: 16px; border-radius: 8px; border: 1px solid #eee;">
+          ${message}
+        </div>
+        <p style="margin-top: 24px; color: #666;">Please respond to the user via email at your earliest convenience.</p>
+      </div>
+
+    `
+  };
+
+  const userMail = {
+    from: 'thedevrohit@gmail.com',
+    to: email,
+    subject: 'Thank you for reaching out!',
+    html: `
+      <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 12px; padding: 24px;">
+        <div style="text-align: center;">
+          <img src=${logoUrl} alt="Hirealis" style="height: 56px; margin-bottom: 16px;" />
+          <h2 style="color: #333;">Thank You for Reaching Out! 🙌</h2>
+        </div>
+        
+        <p>Hi <strong>${name}</strong>,</p>
+
+        <p>We’ve received your message and our team will get back to you as soon as possible. Here’s a quick summary of your query:</p>
+
+        <div style="background: #f9f9f9; padding: 16px; border-radius: 8px; border: 1px solid #eee; margin-bottom: 16px;">
+          <p style="margin: 0;"><strong>Your Message:</strong></p>
+          <p style="margin: 0;">${message}</p>
+        </div>
+
+        <p>We appreciate your patience and are here to help you in every possible way.</p>
+
+        <p style="margin-top: 24px;">Warm regards,<br/>
+        <strong>Team YourAppName</strong><br/>
+        <a href="https://hirealis-web.vercel.app/" style="color: #4a90e2;">Visit Website</a> | <a href="mailto:support@yourapp.com" style="color: #4a90e2;">support@yourapp.com</a></p>
+      </div>
+    `
+  };
+
+  try {
+    await transporter.sendMail(supportMail);
+    await transporter.sendMail(userMail);
+    res.status(200).send({ success: true, message: 'Support email sent successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ success: false, error: 'Failed to send email' });
+  }
+};
+
 
 exports.signup = async (req, res) => {
   try {
@@ -190,7 +259,6 @@ exports.sendMailToHR = async (req, res) => {
       },
     });
 
-    const logoUrl = "https://hirealis-web.vercel.app/assets/logo-BEQSbQOd.png";
 
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; padding: 20px;">
