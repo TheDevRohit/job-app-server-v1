@@ -14,6 +14,7 @@ app.use(express.json()); // Parse JSON body
 // Import routes
 const authRoutes = require('./routes/auth_route');
 const jobRoutes = require('./routes/job_route');
+const articleRoute = require('./routes/article')
 const notificationRoutes = require('./routes/notification_route');
 // const userRoutes = require('./routes/user'); // If you have user routes
 
@@ -32,7 +33,8 @@ mongoose.connect(process.env.MONGO_URI, {
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/notifications' , notificationRoutes)
-// app.use('/api/users', userRoutes);
+app.use('/api/article' , articleRoute)
+
 
 // Default route
 app.get('/', (req, res) => {
