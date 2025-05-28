@@ -1,6 +1,6 @@
 const Job = require('../models/job');
 const User = require('../models/user');
-
+const Company = require('../models/company')
 
 exports.createJob = async (req, res) => {
   try {
@@ -33,6 +33,7 @@ exports.createJob = async (req, res) => {
       remote,
       locationType,
       jobLevel,
+      companyDetails,
       duration,
       rolesAndRes,
       openings,
@@ -43,6 +44,8 @@ exports.createJob = async (req, res) => {
     if (!title || !company || !description || !location || !jobType || !hrEmail) {
       return res.status(400).json({ message: 'Please provide all required fields' });
     }
+
+  
 
     // Check user role
     if (!['admin', 'jobposter'].includes(req.user.userType)) {
@@ -59,6 +62,7 @@ exports.createJob = async (req, res) => {
       skillsRequired,
       experience,
       education,
+      companyDetails,
       companyLogo,
       companyWebsite,
       companySize,
@@ -85,8 +89,13 @@ exports.createJob = async (req, res) => {
       postedBy: req.user.id,
       status: 'open',
     });
-
+    
     await job.save();
+    if(companyDetails != null){
+      const newCompnay = await Company(companyDetails) 
+       newCompnay.save();
+    }
+    
     res.status(201).json({
       message: "Job created successfully",
       job,

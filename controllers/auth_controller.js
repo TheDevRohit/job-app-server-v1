@@ -431,21 +431,34 @@ const sendEmailOTPHelper = async (to, otp) => {
 exports.sendEmailOTP = async (req, res) => {
   try {
     const { email } = req.body;
+
+    // Check if email is provided
     if (!email) return res.status(400).json({ message: "Email required" });
 
+    // Validate email format using regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ message: "Invalid email format" });
+    }
+
+    // Generate 6-digit OTP
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
+    // Send OTP
     await sendEmailOTPHelper(email, otp);
 
+    // Store OTP with expiry (5 minutes)
     otpStore[email] = { otp, expires: Date.now() + 5 * 60 * 1000 };
 
     res.json({ message: "OTP sent to email" });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to send OTP", error: error.message });
+    res.status(500).json({
+      message: "Failed to send OTP",
+      error: error.message,
+    });
   }
 };
+
 
 exports.verifyEmailOTP = async (req, res) => {
   try {
@@ -884,3 +897,4 @@ exports.verifyOtp = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+

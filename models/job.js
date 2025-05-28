@@ -42,6 +42,7 @@ const jobSchema = new mongoose.Schema({
     type: [String],
     default: [],
   },
+  companyDetails : {type : mongoose.Schema.Types.ObjectId, ref : 'Company'},
   remote: { type: Boolean, default: false },
   locationType: {
     type: [String],
