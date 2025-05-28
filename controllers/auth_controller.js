@@ -589,25 +589,26 @@ const profileUpdateStorage = multer.diskStorage({
 // File filter for profile updates
 const profileUpdateFileFilter = (req, file, cb) => {
   if (file.fieldname === 'profileImage') {
-    const imageTypes = '/jpeg|jpg|png|gif/';
+    const imageTypes = /\.(jpeg|jpg|png|gif)$/;
     const extname = imageTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = imageTypes.test(file.mimetype);
+    const mimetype = /image\/(jpeg|jpg|png|gif)/.test(file.mimetype);
     if (extname && mimetype) {
       return cb(null, true);
     }
-    cb('Error: Profile image must be jpeg, jpg, png, or gif!');
+    cb(new Error('Profile image must be jpeg, jpg, png, or gif!'));
   } else if (file.fieldname === 'resume') {
-    const docTypes = '/pdf|doc|docx/';
+    const docTypes = /\.(pdf|doc|docx)$/;
     const extname = docTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = docTypes.test(file.mimetype);
+    const mimetype = /(application\/pdf|application\/msword|application\/vnd.openxmlformats-officedocument.wordprocessingml.document)/.test(file.mimetype);
     if (extname && mimetype) {
       return cb(null, true);
     }
-    cb('Error: Resume must be PDF or Word document!');
+    cb(new Error('Resume must be PDF or Word document!'));
   } else {
-    cb('Error: Unsupported file type!');
+    cb(new Error('Unsupported file type!'));
   }
 };
+
 
 // Multer middleware for profile updates
 const updateProfileUpload = multer({
@@ -650,24 +651,24 @@ exports.updateProfile = async (req, res) => {
       }
 
       // Convert stringified fields to objects if needed
-      if (updates.skills && typeof updates.skills === 'string') {
-        try {
-          updates.skills = JSON.parse(updates.skills);
-        } catch (e) {
-          return res.status(400).json({ message: 'Invalid skills format' });
-        }
-      }
+      // if (updates.skills && typeof updates.skills === 'string') {
+      //   try {
+      //     updates.skills = JSON.parse(updates.skills);
+      //   } catch (e) {
+      //     return res.status(400).json({ message: 'Invalid skills format' });
+      //   }
+      // }
 
       // Handle education and experience if they're stringified arrays
-      ['education', 'experience'].forEach(field => {
-        if (updates[field] && typeof updates[field] === 'string') {
-          try {
-            updates[field] = JSON.parse(updates[field]);
-          } catch (e) {
-            console.warn(`Failed to parse ${field}`, e);
-          }
-        }
-      });
+      // ['education', 'experience'].forEach(field => {
+      //   if (updates[field] && typeof updates[field] === 'string') {
+      //     try {
+      //       updates[field] = JSON.parse(updates[field]);
+      //     } catch (e) {
+      //       console.warn(`Failed to parse ${field}`, e);
+      //     }
+      //   }
+      // });
 
       // Update user in database
       const updatedUser = await User.findByIdAndUpdate(
