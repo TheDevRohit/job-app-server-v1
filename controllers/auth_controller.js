@@ -589,13 +589,14 @@ const profileUpdateStorage = multer.diskStorage({
 // File filter for profile updates
 const profileUpdateFileFilter = (req, file, cb) => {
   if (file.fieldname === 'profileImage') {
-    const imageTypes = /\.(jpeg|jpg|png|gif)$/;
-    const extname = imageTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = /image\/(jpeg|jpg|png|gif)/.test(file.mimetype);
-    if (extname && mimetype) {
+    // const imageTypes = /\.(jpeg|jpg|png|gif)$/;
+    // const extname = imageTypes.test(path.extname(file.originalname).toLowerCase());
+    // const mimetype = /image\/(jpeg|jpg|png|gif)/.test(file.mimetype);
+    // if (extname && mimetype) {
+    // }
+    // cb(new Error('Profile image must be jpeg, jpg, png, or gif!'));
       return cb(null, true);
-    }
-    cb(new Error('Profile image must be jpeg, jpg, png, or gif!'));
+
   } else if (file.fieldname === 'resume') {
     const docTypes = /\.(pdf|doc|docx)$/;
     const extname = docTypes.test(path.extname(file.originalname).toLowerCase());
