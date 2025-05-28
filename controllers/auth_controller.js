@@ -27,6 +27,7 @@ const storage = multer.diskStorage({
     cb(null, req.user.id + "-" + Date.now() + path.extname(file.originalname));
   },
 });
+
 const upload = multer({ storage: storage }).single("resume");
 
 // Helper: generate JWT
@@ -39,6 +40,7 @@ function generateToken(user) {
     }
   );
 }
+
 const logoUrl = "https://hirealis-web.vercel.app/assets/logo-BEQSbQOd.png";
 
 exports.support = async (req, res) => {
@@ -88,7 +90,7 @@ exports.support = async (req, res) => {
 
         <p style="margin-top: 24px;">Warm regards,<br/>
         <strong>Team YourAppName</strong><br/>
-        <a href="https://hirealis-web.vercel.app/" style="color: #4a90e2;">Visit Website</a> | <a href="mailto:support@yourapp.com" style="color: #4a90e2;">support@yourapp.com</a></p>
+        <a href="https://hirealis-web.vercel.app/" style="color: #00539C;">Visit Website</a> | <a href="mailto:support@yourapp.com" style="color: #00539C;">support@yourapp.com</a></p>
       </div>
     `,
   };
@@ -144,7 +146,7 @@ exports.signup = async (req, res) => {
     <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 12px; padding: 24px; background-color: #ffffff;">
       <div style="text-align: center;">
         <img src="${logoUrl}" alt="Hirealis" style="height: 56px; margin-bottom: 16px;" />
-        <h2 style="color: #004aad;">Welcome to Hirealis! 🎉</h2>
+        <h2 style="color: #00539C;">Welcome to Hirealis! 🎉</h2>
       </div>
       
       <p style="font-size: 16px; color: #333;">Hi <strong>${name}</strong>,</p>
@@ -158,7 +160,7 @@ exports.signup = async (req, res) => {
       </p>
 
       <div style="text-align: center; margin: 32px 0;">
-        <a href="https://hirealis-web.vercel.app/" target="_blank" style="background-color: #004aad; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Find Jobs Now</a>
+        <a href="https://hirealis-web.vercel.app/" target="_blank" style="background-color: #00539C; color: white; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;">Find Jobs Now</a>
       </div>
 
       <p style="font-size: 14px; color: #555; margin-top: 24px;">
@@ -168,7 +170,7 @@ exports.signup = async (req, res) => {
       <p style="font-size: 14px; color: #555;">
         Best wishes,<br/>
         <strong>Team Hirealis</strong><br/>
-        <a href="mailto:support@hirealis.com" style="color: #004aad;">support@yourapp.com</a>
+        <a href="mailto:support@hirealis.com" style="color: #00539C;">support@yourapp.com</a>
       </p>
     </div>
   `,
@@ -311,7 +313,7 @@ exports.sendMailToHR = async (req, res) => {
         ${
           resumeUrl
             ? `
-        <p><strong>Resume:</strong> <a href="${resumeUrl}" target="_blank" style="color: #1a73e8;">View Resume</a></p>
+        <p><strong>Resume:</strong> <a href="${resumeUrl}" target="_blank" style="color: #00539C;">View Resume</a></p>
         `
             : ""
         }
@@ -391,7 +393,7 @@ const sendEmailOTPHelper = async (to, otp) => {
       html: `
       <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
         <div style="max-width: 600px; margin: auto; background-color: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-          <div style="background-color: #673ab7; padding: 20px; text-align: center;">
+          <div style="background-color: #00539C; padding: 20px; text-align: center;">
             <img src="https://hirealis-web.vercel.app/assets/logo-BEQSbQOd.png" alt="Hirealis Logo" style="height: 50px;" />
             <h2 style="color: #fff; margin-top: 10px;">OTP Verification</h2>
           </div>
@@ -402,7 +404,7 @@ const sendEmailOTPHelper = async (to, otp) => {
               You recently requested to verify your email address with <strong>Hirealis</strong>.
               Please use the following OTP to proceed:
             </p>
-            <h1 style="font-size: 32px; color: #673ab7; margin: 20px 0;">${otp}</h1>
+            <h1 style="font-size: 32px; color: #00539C; margin: 20px 0;">${otp}</h1>
             <p style="font-size: 14px; color: #555;">
               This OTP is valid for the next <strong>5 minutes</strong>.
               <br />
@@ -566,38 +568,182 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-exports.updateProfile = async (req, res) => {
-  try {
-    const id = req.user.id; // Set by auth middleware from JWT
-    const updates = req.body;
-
-    // Optionally handle profile image or resume if you're uploading files
-    if (req.file) {
-      updates.image = req.file.path; // or cloud URL
+// Configure multer for profile updates (add this with your other multer configurations)
+const profileUpdateStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    // Create separate folders for different file types
+    if (file.fieldname === 'profileImage') {
+      cb(null, 'uploads/profile-images/');
+    } else if (file.fieldname === 'resume') {
+      cb(null, 'uploads/resumes/');
+    } else {
+      cb(null, 'uploads/other/');
     }
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, req.user.id + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
 
-    const updatedUser = await User.findByIdAndUpdate(
-      id,
-      { $set: updates },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedUser) {
-      return res.status(404).json({ message: "User not found" });
+// File filter for profile updates
+const profileUpdateFileFilter = (req, file, cb) => {
+  if (file.fieldname === 'profileImage') {
+    const imageTypes = '/jpeg|jpg|png|gif/';
+    const extname = imageTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = imageTypes.test(file.mimetype);
+    if (extname && mimetype) {
+      return cb(null, true);
     }
-
-    const { password, ...userWithoutPassword } = updatedUser.toObject();
-
-    res.status(200).json({
-      message: "Profile updated successfully",
-      user: userWithoutPassword,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Failed to update profile", error: error.message });
+    cb('Error: Profile image must be jpeg, jpg, png, or gif!');
+  } else if (file.fieldname === 'resume') {
+    const docTypes = '/pdf|doc|docx/';
+    const extname = docTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = docTypes.test(file.mimetype);
+    if (extname && mimetype) {
+      return cb(null, true);
+    }
+    cb('Error: Resume must be PDF or Word document!');
+  } else {
+    cb('Error: Unsupported file type!');
   }
 };
+
+// Multer middleware for profile updates
+const updateProfileUpload = multer({
+  storage: profileUpdateStorage,
+  fileFilter: profileUpdateFileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB for images
+    files: 2 // Maximum 2 files (image + resume)
+  }
+}).fields([
+  { name: 'profileImage', maxCount: 1 },
+  { name: 'resume', maxCount: 1 }
+]);
+
+// Updated updateProfile function
+exports.updateProfile = async (req, res) => {
+  // First handle file uploads if any
+  updateProfileUpload(req, res, async (err) => {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ message: 'File too large. Max 5MB allowed.' });
+      }
+      return res.status(400).json({ message: err.message || 'File upload error' });
+    }
+
+    try {
+      const userId = req.user.id;
+      const updates = req.body;
+      
+      // Handle uploaded files
+      if (req.files) {
+        if (req.files['profileImage']) {
+          updates.image = req.files['profileImage'][0].path;
+          // For cloud storage: updates.image = req.files['profileImage'][0].location;
+        }
+        if (req.files['resume']) {
+          updates.resume = req.files['resume'][0].path;
+          // For cloud storage: updates.resume = req.files['resume'][0].location;
+        }
+      }
+
+      // Convert stringified fields to objects if needed
+      if (updates.skills && typeof updates.skills === 'string') {
+        try {
+          updates.skills = JSON.parse(updates.skills);
+        } catch (e) {
+          return res.status(400).json({ message: 'Invalid skills format' });
+        }
+      }
+
+      // Handle education and experience if they're stringified arrays
+      ['education', 'experience'].forEach(field => {
+        if (updates[field] && typeof updates[field] === 'string') {
+          try {
+            updates[field] = JSON.parse(updates[field]);
+          } catch (e) {
+            console.warn(`Failed to parse ${field}`, e);
+          }
+        }
+      });
+
+      // Update user in database
+      const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        { $set: updates },
+        { 
+          new: true, 
+          runValidators: true,
+          select: '-password -__v' // Exclude sensitive/uneeded fields
+        }
+      );
+
+      if (!updatedUser) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      // Prepare response
+      const userResponse = updatedUser.toObject();
+      
+      // Convert file paths to URLs if needed
+      if (userResponse.image && !userResponse.image.startsWith('http')) {
+        userResponse.image = `${req.protocol}://${req.get('host')}/${userResponse.image.replace(/\\/g, '/')}`;
+      }
+      if (userResponse.resume && !userResponse.resume.startsWith('http')) {
+        userResponse.resume = `${req.protocol}://${req.get('host')}/${userResponse.resume.replace(/\\/g, '/')}`;
+      }
+
+      res.status(200).json({
+        message: 'Profile updated successfully',
+        user: userResponse
+      });
+
+    } catch (error) {
+      console.error('Profile update error:', error);
+      res.status(500).json({ 
+        message: 'Failed to update profile', 
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      });
+    }
+  });
+};
+
+
+// exports.updateProfile = async (req, res) => {
+//   try {
+//     const id = req.user.id; // Set by auth middleware from JWT
+//     const updates = req.body;
+
+//     // Optionally handle profile image or resume if you're uploading files
+//     if (req.file) {
+//       updates.image = req.file.path; // or cloud URL
+//     }
+
+//     const updatedUser = await User.findByIdAndUpdate(
+//       id,
+//       { $set: updates },
+//       { new: true, runValidators: true }
+//     );
+
+//     if (!updatedUser) {
+//       return res.status(404).json({ message: "User not found" });
+//     }
+
+//     const { password, ...userWithoutPassword } = updatedUser.toObject();
+
+//     res.status(200).json({
+//       message: "Profile updated successfully",
+//       user: userWithoutPassword,
+//     });
+//   } catch (error) {
+//     res
+//       .status(500)
+//       .json({ message: "Failed to update profile", error: error.message });
+//   }
+// };
 
 exports.uploadResume = (req, res) => {
   upload(req, res, async (err) => {
