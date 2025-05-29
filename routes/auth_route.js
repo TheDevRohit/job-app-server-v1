@@ -21,6 +21,8 @@ router.post('/support', userController.support);
 // send email otp
 router.post('/send-email-otp' , userController.sendEmailOTP);
 
+//delete Account
+router.post('/delete-account' , auth , userController.deleteAccount);
 
 // verify email otp
 router.post('/verify-email-otp' , userController.verifyEmailOTP);

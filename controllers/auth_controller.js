@@ -823,6 +823,27 @@ exports.applyJob = async (req, res) => {
   }
 };
 
+
+exports.deleteAccount =  async (req, res) => {
+  try {
+    const userId = req.user.id; // From auth middleware
+    const { message } = req.body;
+
+    // Optionally log or process the message before deleting
+    console.log(`User ${userId} requested account deletion with message:`, message);
+
+    // Delete user from DB
+    await User.findByIdAndDelete(userId);
+
+    // You might also delete related data here (jobs, applications, etc.)
+
+    res.status(200).json({ success: true, message: "Account deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting account:", error);
+    res.status(500).json({ success: false, error: "Failed to delete account." });
+  }
+};
+
 exports.addFavorite = async (req, res) => {
   try {
     const userId = req.user.id;
