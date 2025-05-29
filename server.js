@@ -17,8 +17,7 @@ const jobRoutes = require('./routes/job_route');
 const articleRoute = require('./routes/article')
 const notificationRoutes = require('./routes/notification_route');
 const companyRoute = require('./routes/compnay_routes')
-// const userRoutes = require('./routes/user'); // If you have user routes
-
+const bannerRoute = require('./routes/banner_route')
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -36,7 +35,7 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/notifications' , notificationRoutes)
 app.use('/api/article' , articleRoute)
 app.use('/api/company', companyRoute)
-
+app.use('/api/banner'  ,bannerRoute )
 
 // Default route
 app.get('/', (req, res) => {
