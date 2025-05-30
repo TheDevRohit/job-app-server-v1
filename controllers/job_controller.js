@@ -1,7 +1,7 @@
 const Job = require('../models/job');
 const User = require('../models/user');
 const Company = require('../models/company')
-
+const Notification = require("../models/notification");
 exports.createJob = async (req, res) => {
   try {
     const {
@@ -269,7 +269,20 @@ exports.applyJob = async (req, res) => {
       await user.save();
     }
 
-    res.json({ message: 'Applied successfully' });
+    const jobNotification = new Notification({
+      title: `You’ve Successfully Applied! 🎉 `, // Replace with your app name
+      message: `✅ You applied for the role of **${job.title}** 🚀 Our team will review your application and get back to you soon. Good luck! 🍀`,
+      targetUsers: [user._id],
+      isClicked: true,
+      jobId: job.id,
+      isGlobal: false,
+    });
+    await jobNotification.save();
+    res.json({
+      message: "Applied successfully",
+      title: "You’ve Successfully Applied! 🎉 ",
+      subTitle: `✅ You applied for the role of **${job.title}** 🚀 Our team will review your application and get back to you soon. Good luck! 🍀`,
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
