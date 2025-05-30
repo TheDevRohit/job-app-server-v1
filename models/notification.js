@@ -14,6 +14,13 @@ const notificationSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  isClicked: {
+    type: Boolean,
+    default: false,
+  },
+  jobId: {
+    type: String,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

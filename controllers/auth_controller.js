@@ -252,6 +252,35 @@ exports.login = async (req, res) => {
   }
 };
 
+exports.socialLogin = async (req, res) => {
+  const { uid, email, name, photo, provider } = req.body;
+
+  // Check if user exists first
+  let user = await User.findOne({ email });
+
+  if (!user) {
+    // User not found, create new user
+    user = new User({ uid, email, name, photo, provider });
+    await user.save();
+  } else {
+    // Optional: update user info if needed
+    user.uid = uid;
+    user.name = name;
+    user.photo = photo;
+    user.provider = provider;
+    await user.save();
+  }
+
+  const token = generateToken(user);
+  const { password: pwd, ...userWithoutPassword } = user.toObject();
+
+  res.status(200).json({
+    message: "Logged in successfully",
+    token,
+    user: userWithoutPassword,
+  });
+};
+
 exports.sendOTP = async (req, res) => {
   try {
     const { mobile } = req.body;
@@ -371,13 +400,11 @@ exports.sendMailToHR = async (req, res) => {
       .json({ success: true, message: "Mail sent to HR successfully" });
   } catch (error) {
     console.error("Error in sendMailToHR:", error);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Failed to send email to HR",
-        error: error.message,
-      });
+    return res.status(500).json({
+      success: false,
+      message: "Failed to send email to HR",
+      error: error.message,
+    });
   }
 };
 
@@ -458,7 +485,6 @@ exports.sendEmailOTP = async (req, res) => {
     });
   }
 };
-
 
 exports.verifyEmailOTP = async (req, res) => {
   try {
@@ -585,44 +611,50 @@ exports.changePassword = async (req, res) => {
 const profileUpdateStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     // Create separate folders for different file types
-    if (file.fieldname === 'profileImage') {
-      cb(null, 'uploads/profile-images/');
-    } else if (file.fieldname === 'resume') {
-      cb(null, 'uploads/resumes/');
+    if (file.fieldname === "profileImage") {
+      cb(null, "uploads/profile-images/");
+    } else if (file.fieldname === "resume") {
+      cb(null, "uploads/resumes/");
     } else {
-      cb(null, 'uploads/other/');
+      cb(null, "uploads/other/");
     }
   },
   filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, req.user.id + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(
+      null,
+      req.user.id + "-" + uniqueSuffix + path.extname(file.originalname)
+    );
+  },
 });
 
 // File filter for profile updates
 const profileUpdateFileFilter = (req, file, cb) => {
-  if (file.fieldname === 'profileImage') {
+  if (file.fieldname === "profileImage") {
     // const imageTypes = /\.(jpeg|jpg|png|gif)$/;
     // const extname = imageTypes.test(path.extname(file.originalname).toLowerCase());
     // const mimetype = /image\/(jpeg|jpg|png|gif)/.test(file.mimetype);
     // if (extname && mimetype) {
     // }
     // cb(new Error('Profile image must be jpeg, jpg, png, or gif!'));
-      return cb(null, true);
-
-  } else if (file.fieldname === 'resume') {
+    return cb(null, true);
+  } else if (file.fieldname === "resume") {
     const docTypes = /\.(pdf|doc|docx)$/;
-    const extname = docTypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = /(application\/pdf|application\/msword|application\/vnd.openxmlformats-officedocument.wordprocessingml.document)/.test(file.mimetype);
+    const extname = docTypes.test(
+      path.extname(file.originalname).toLowerCase()
+    );
+    const mimetype =
+      /(application\/pdf|application\/msword|application\/vnd.openxmlformats-officedocument.wordprocessingml.document)/.test(
+        file.mimetype
+      );
     if (extname && mimetype) {
       return cb(null, true);
     }
-    cb(new Error('Resume must be PDF or Word document!'));
+    cb(new Error("Resume must be PDF or Word document!"));
   } else {
-    cb(new Error('Unsupported file type!'));
+    cb(new Error("Unsupported file type!"));
   }
 };
-
 
 // Multer middleware for profile updates
 const updateProfileUpload = multer({
@@ -630,11 +662,11 @@ const updateProfileUpload = multer({
   fileFilter: profileUpdateFileFilter,
   limits: {
     fileSize: 5 * 1024 * 1024, // 5MB for images
-    files: 2 // Maximum 2 files (image + resume)
-  }
+    files: 2, // Maximum 2 files (image + resume)
+  },
 }).fields([
-  { name: 'profileImage', maxCount: 1 },
-  { name: 'resume', maxCount: 1 }
+  { name: "profileImage", maxCount: 1 },
+  { name: "resume", maxCount: 1 },
 ]);
 
 // Updated updateProfile function
@@ -642,24 +674,28 @@ exports.updateProfile = async (req, res) => {
   // First handle file uploads if any
   updateProfileUpload(req, res, async (err) => {
     if (err) {
-      if (err.code === 'LIMIT_FILE_SIZE') {
-        return res.status(400).json({ message: 'File too large. Max 5MB allowed.' });
+      if (err.code === "LIMIT_FILE_SIZE") {
+        return res
+          .status(400)
+          .json({ message: "File too large. Max 5MB allowed." });
       }
-      return res.status(400).json({ message: err.message || 'File upload error' });
+      return res
+        .status(400)
+        .json({ message: err.message || "File upload error" });
     }
 
     try {
       const userId = req.user.id;
       const updates = req.body;
-      
+
       // Handle uploaded files
       if (req.files) {
-        if (req.files['profileImage']) {
-          updates.image = req.files['profileImage'][0].path;
+        if (req.files["profileImage"]) {
+          updates.image = req.files["profileImage"][0].path;
           // For cloud storage: updates.image = req.files['profileImage'][0].location;
         }
-        if (req.files['resume']) {
-          updates.resume = req.files['resume'][0].path;
+        if (req.files["resume"]) {
+          updates.resume = req.files["resume"][0].path;
           // For cloud storage: updates.resume = req.files['resume'][0].location;
         }
       }
@@ -688,44 +724,46 @@ exports.updateProfile = async (req, res) => {
       const updatedUser = await User.findByIdAndUpdate(
         userId,
         { $set: updates },
-        { 
-          new: true, 
+        {
+          new: true,
           runValidators: true,
-          select: '-password -__v' // Exclude sensitive/uneeded fields
+          select: "-password -__v", // Exclude sensitive/uneeded fields
         }
       );
 
       if (!updatedUser) {
-        return res.status(404).json({ message: 'User not found' });
+        return res.status(404).json({ message: "User not found" });
       }
 
       // Prepare response
       const userResponse = updatedUser.toObject();
-      
+
       // Convert file paths to URLs if needed
-      if (userResponse.image && !userResponse.image.startsWith('http')) {
-        userResponse.image = `${req.protocol}://${req.get('host')}/${userResponse.image.replace(/\\/g, '/')}`;
+      if (userResponse.image && !userResponse.image.startsWith("http")) {
+        userResponse.image = `${req.protocol}://${req.get(
+          "host"
+        )}/${userResponse.image.replace(/\\/g, "/")}`;
       }
-      if (userResponse.resume && !userResponse.resume.startsWith('http')) {
-        userResponse.resume = `${req.protocol}://${req.get('host')}/${userResponse.resume.replace(/\\/g, '/')}`;
+      if (userResponse.resume && !userResponse.resume.startsWith("http")) {
+        userResponse.resume = `${req.protocol}://${req.get(
+          "host"
+        )}/${userResponse.resume.replace(/\\/g, "/")}`;
       }
 
       res.status(200).json({
-        message: 'Profile updated successfully',
-        user: userResponse
+        message: "Profile updated successfully",
+        user: userResponse,
       });
-
     } catch (error) {
-      console.error('Profile update error:', error);
-      res.status(500).json({ 
-        message: 'Failed to update profile', 
+      console.error("Profile update error:", error);
+      res.status(500).json({
+        message: "Failed to update profile",
         error: error.message,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
       });
     }
   });
 };
-
 
 // exports.updateProfile = async (req, res) => {
 //   try {
@@ -817,30 +855,49 @@ exports.applyJob = async (req, res) => {
     // Also save applied job in user's appliedJobs
     await User.findByIdAndUpdate(userId, { $addToSet: { appliedJobs: jobId } });
 
-    res.json({ message: "Applied successfully" });
+    const jobNotification = new Notification({
+      title: `You’ve Successfully Applied! 🎉 `, // Replace with your app name
+      message: `✅ You applied for the role of **${job.title}** 🚀 Our team will review your application and get back to you soon. Good luck! 🍀`,
+      targetUsers: [user._id],
+      isClicked: true,
+      jobId: job.id,
+      isGlobal: false,
+    });
+    await jobNotification.save();
+     res.json({
+      message: "Applied successfully",
+      title: "You’ve Successfully Applied! 🎉 ",
+      subTitle: `✅ You applied for the role of **${job.title}** 🚀 Our team will review your application and get back to you soon. Good luck! 🍀`,
+     });
   } catch (error) {
     res.status(500).json({ message: "Failed to apply", error: error.message });
   }
 };
 
-
-exports.deleteAccount =  async (req, res) => {
+exports.deleteAccount = async (req, res) => {
   try {
     const userId = req.user.id; // From auth middleware
     const { message } = req.body;
 
     // Optionally log or process the message before deleting
-    console.log(`User ${userId} requested account deletion with message:`, message);
+    console.log(
+      `User ${userId} requested account deletion with message:`,
+      message
+    );
 
     // Delete user from DB
     await User.findByIdAndDelete(userId);
 
     // You might also delete related data here (jobs, applications, etc.)
 
-    res.status(200).json({ success: true, message: "Account deleted successfully." });
+    res
+      .status(200)
+      .json({ success: true, message: "Account deleted successfully." });
   } catch (error) {
     console.error("Error deleting account:", error);
-    res.status(500).json({ success: false, error: "Failed to delete account." });
+    res
+      .status(500)
+      .json({ success: false, error: "Failed to delete account." });
   }
 };
 
@@ -918,4 +975,3 @@ exports.verifyOtp = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
-
