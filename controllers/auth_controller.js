@@ -89,8 +89,8 @@ exports.support = async (req, res) => {
         <p>We appreciate your patience and are here to help you in every possible way.</p>
 
         <p style="margin-top: 24px;">Warm regards,<br/>
-        <strong>Team YourAppName</strong><br/>
-        <a href="https://hirealis-web.vercel.app/" style="color: #00539C;">Visit Website</a> | <a href="mailto:support@yourapp.com" style="color: #00539C;">support@yourapp.com</a></p>
+        <strong>Team Hirealis</strong><br/>
+        <a href="https://hirealis-web.vercel.app/" style="color: #00539C;">Visit Website</a> | <a href="mailto:support@hirealis.com" style="color: #00539C;">support@hirealis.com</a></p>
       </div>
     `,
   };
@@ -170,7 +170,7 @@ exports.signup = async (req, res) => {
       <p style="font-size: 14px; color: #555;">
         Best wishes,<br/>
         <strong>Team Hirealis</strong><br/>
-        <a href="mailto:support@hirealis.com" style="color: #00539C;">support@yourapp.com</a>
+        <a href="mailto:support@hirealis.com" style="color: #00539C;">support@hirealis.com</a>
       </p>
     </div>
   `,
@@ -415,7 +415,7 @@ const sendEmailOTPHelper = async (to, otp) => {
     console.log("otp = ", otp);
 
     await transporter.sendMail({
-      from: 'thedevrohit@gmail.com',
+      from: '"Hirealis Support" <thedevrohit@gmail.com>',
       to: to,
       subject: "Your OTP Code - Hirealis",
       html: `
