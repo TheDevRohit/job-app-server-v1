@@ -415,7 +415,7 @@ const sendEmailOTPHelper = async (to, otp) => {
     console.log("otp = ", otp);
 
     await transporter.sendMail({
-      from: '"Hirealis Support" <thedevrohit@gmail.com>',
+      from: 'thedevrohit@gmail.com',
       to: to,
       subject: "Your OTP Code - Hirealis",
       html: `
