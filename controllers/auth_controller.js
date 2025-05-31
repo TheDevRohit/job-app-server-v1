@@ -314,7 +314,7 @@ const transporter = nodemailer.createTransport({
 
 exports.sendMailToHR = async (req, res) => {
   try {
-    const { hrEmail, subject, description, from, resumeUrl } = req.body;
+    const { hrEmail, subject, description, from, resumeUrl , companyName , jobPosition  } = req.body;
 
     if (!hrEmail || !subject || !description) {
       return res.status(400).json({
@@ -369,7 +369,7 @@ exports.sendMailToHR = async (req, res) => {
       <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
         <h2>🎉 Congratulations!</h2>
         <p>Dear candidate,</p>
-        <p>You have <strong>successfully applied</strong> for the job position via <strong>Hirealis</strong>.</p>
+        <p>You have <strong>successfully applied</strong> for the job position ${jobPosition} at ${companyName} via <strong>Hirealis</strong>.</p>
         <p>Your application has been sent to the respective HR. We wish you the best of luck in your job journey!</p>
 
         <p>If you have attached your resume, it has been shared as part of the application.</p>
@@ -398,6 +398,7 @@ exports.sendMailToHR = async (req, res) => {
     return res
       .status(200)
       .json({ success: true, message: "Mail sent to HR successfully" });
+      
   } catch (error) {
     console.error("Error in sendMailToHR:", error);
     return res.status(500).json({
@@ -855,20 +856,7 @@ exports.applyJob = async (req, res) => {
     // Also save applied job in user's appliedJobs
     await User.findByIdAndUpdate(userId, { $addToSet: { appliedJobs: jobId } });
 
-    const jobNotification = new Notification({
-      title: `You’ve Successfully Applied! 🎉 `, // Replace with your app name
-      message: `✅ You applied for the role of **${job.title}** 🚀 Our team will review your application and get back to you soon. Good luck! 🍀`,
-      targetUsers: [user._id],
-      isClicked: true,
-      jobId: job.id,
-      isGlobal: false,
-    });
-    await jobNotification.save();
-     res.json({
-      message: "Applied successfully",
-      title: "You’ve Successfully Applied! 🎉 ",
-      subTitle: `✅ You applied for the role of **${job.title}** 🚀 Our team will review your application and get back to you soon. Good luck! 🍀`,
-     });
+  
   } catch (error) {
     res.status(500).json({ message: "Failed to apply", error: error.message });
   }
