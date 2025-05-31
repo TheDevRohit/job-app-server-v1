@@ -41,7 +41,7 @@ function generateToken(user) {
   );
 }
 
-const logoUrl = "https://hirealis-web.vercel.app/assets/logo-BEQSbQOd.png";
+const logoUrl = "https://hirealis-web.vercel.app/assets/logo-BifZY4Jf.png";
 
 exports.support = async (req, res) => {
   const { name, email, message } = req.body;
@@ -422,7 +422,7 @@ const sendEmailOTPHelper = async (to, otp) => {
       <div style="font-family: Arial, sans-serif; background-color: #f9f9f9; padding: 30px;">
         <div style="max-width: 600px; margin: auto; background-color: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
           <div style="background-color: #00539C; padding: 20px; text-align: center;">
-            <img src="https://hirealis-web.vercel.app/assets/logo-BEQSbQOd.png" alt="Hirealis Logo" style="height: 50px;" />
+            <img src="${logoUrl}" alt="Hirealis Logo" style="height: 50px;" />
             <h2 style="color: #fff; margin-top: 10px;">OTP Verification</h2>
           </div>
           <div style="padding: 30px; text-align: center;">
