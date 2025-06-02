@@ -359,7 +359,7 @@ exports.sendMailToHR = async (req, res) => {
 
     await transporter.sendMail({
       from: `"Hirealis Applicant" <${fromEmail}>`,
-      to: from,
+      to: hrEmail,
       subject,
       html: htmlContent,
     });
