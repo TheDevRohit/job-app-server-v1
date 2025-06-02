@@ -322,7 +322,7 @@ exports.sendMailToHR = async (req, res) => {
         message: "All fields are required (hrEmail, subject, description)",
       });
     }
-
+    console.log(`fromEmail ${from} HrEmail ${hrEmail}  resume  ${resumeUrl} subject ${subject} description ${description} companyName ${companyName} jobPosition ${jobPosition}`);  
     const fromEmail = from;
 
     const transporter = nodemailer.createTransport({
