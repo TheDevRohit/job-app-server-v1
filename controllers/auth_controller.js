@@ -306,6 +306,8 @@ exports.sendOTP = async (req, res) => {
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
+   secure : true,
+      port : 465,
   auth: {
     user: "hirealis.org@gmail.com",
     pass: "scxbsibgktvbkyvv",
@@ -327,6 +329,8 @@ exports.sendMailToHR = async (req, res) => {
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
+      secure : true,
+      port : 465,
       auth: {
         user: "hirealis.org@gmail.com",
         pass: "scxbsibgktvbkyvv",
