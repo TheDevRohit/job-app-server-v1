@@ -48,7 +48,7 @@ exports.support = async (req, res) => {
 
   const supportMail = {
     from: email,
-    to: "thedevrohit@gmail.com",
+    to: "hirealis.org@gmail.com",
     subject: `Support Query from ${name}`,
     html: `
       <div style="font-family: 'Segoe UI', sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; border-radius: 12px; padding: 24px;">
@@ -67,7 +67,7 @@ exports.support = async (req, res) => {
   };
 
   const userMail = {
-    from: "thedevrohit@gmail.com",
+    from: "hirealis.org@gmail.com",
     to: email,
     subject: "Thank you for reaching out!",
     html: `
@@ -139,7 +139,7 @@ exports.signup = async (req, res) => {
     });
 
     const userMail = {
-      from: "thedevrohit@gmail.com",
+      from: "hirealis.org@gmail.com",
       to: email,
       subject: "🎉 Welcome to Hirealis – Let’s build your career!",
       html: `
@@ -307,8 +307,8 @@ exports.sendOTP = async (req, res) => {
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "thedevrohit@gmail.com",
-    pass: "fyitnuzbzoytnutb",
+    user: "hirealis.org@gmail.com",
+    pass: "scxbsibgktvbkyvv",
   },
 });
 
@@ -328,8 +328,8 @@ exports.sendMailToHR = async (req, res) => {
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: "thedevrohit@gmail.com",
-        pass: "fyitnuzbzoytnutb",
+        user: "hirealis.org@gmail.com",
+        pass: "scxbsibgktvbkyvv",
       },
     });
 
@@ -389,7 +389,7 @@ exports.sendMailToHR = async (req, res) => {
 
     // Send confirmation to user
     await transporter.sendMail({
-      from: `"Hirealis Team" <thedevrohit@gmail.com>`,
+      from: `"Hirealis Team" <hirealis.org@gmail.com>`,
       to: from,
       subject: "✅ Application Received – Hirealis",
       html: htmlContentUser,
@@ -415,7 +415,7 @@ const sendEmailOTPHelper = async (to, otp) => {
     console.log("otp = ", otp);
 
     await transporter.sendMail({
-      from: '"Hirealis Support" <thedevrohit@gmail.com>',
+      from: '"Hirealis Support" <hirealis.org@gmail.com>',
       to: to,
       subject: "Your OTP Code - Hirealis",
       html: `
