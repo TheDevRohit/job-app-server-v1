@@ -913,7 +913,7 @@ exports.removeFavorite = async (req, res) => {
 
     await User.findByIdAndUpdate(userId, { $pull: { favorites: jobId } });
 
-    res.json({ message: "Removed from favorites" });
+    res.json({ message: "Removed from saved" });
   } catch (error) {
     res.status(500).json({ message: "Failed", error: error.message });
   }
