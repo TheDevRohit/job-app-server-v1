@@ -900,7 +900,7 @@ exports.addFavorite = async (req, res) => {
 
     await User.findByIdAndUpdate(userId, { $addToSet: { favorites: jobId } });
 
-    res.json({ message: "Added to favorites" });
+    res.json({ message: "Saved Job Successfully" });
   } catch (error) {
     res.status(500).json({ message: "Failed", error: error.message });
   }
