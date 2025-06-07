@@ -688,10 +688,15 @@ exports.updateProfile = async (req, res) => {
         .status(400)
         .json({ message: err.message || "File upload error" });
     }
-
+  
     try {
       const userId = req.user.id;
       const updates = req.body;
+      
+
+      if (updates.avatarImage) {
+        updates.image = updates.avatarImage; // Use avatar link as image
+      }
 
       // Handle uploaded files
       if (req.files) {
@@ -704,6 +709,7 @@ exports.updateProfile = async (req, res) => {
           // For cloud storage: updates.resume = req.files['resume'][0].location;
         }
       }
+
 
       // Convert stringified fields to objects if needed
       // if (updates.skills && typeof updates.skills === 'string') {
@@ -913,7 +919,7 @@ exports.removeFavorite = async (req, res) => {
 
     await User.findByIdAndUpdate(userId, { $pull: { favorites: jobId } });
 
-    res.json({ message: "Removed from saved" });
+    res.json({ message: "Removed from saved", jobId: jobId });
   } catch (error) {
     res.status(500).json({ message: "Failed", error: error.message });
   }

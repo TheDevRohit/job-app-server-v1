@@ -310,12 +310,12 @@ exports.toggleFavoriteJob = async (req, res) => {
       // Remove from favorites
       user.favoriteJobs = user.favoriteJobs.filter(j => j.toString() !== jobId);
       await user.save();
-      return res.json({ message: 'Removed from saved' });
+      return res.json({ message: 'Removed from saved' , jobs: user.favoriteJobs });
     } else {
       // Add to favorites
       user.favoriteJobs.push(jobId);
       await user.save();
-      return res.json({ message: 'Saved Job Sucessfully' });
+      return res.json({ message: 'Saved Job Sucessfully' , jobs: user.favoriteJobs });
     }
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
