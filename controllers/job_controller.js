@@ -62,7 +62,7 @@ exports.createJob = async (req, res) => {
       skillsRequired,
       experience,
       education,
-      companyDetails,
+      // companyDetails,
       companyLogo,
       companyWebsite,
       companySize,
@@ -91,10 +91,10 @@ exports.createJob = async (req, res) => {
     });
     
     await job.save();
-    if(companyDetails != null){
-      const newCompnay = await Company(companyDetails) 
-       newCompnay.save();
-    }
+    // if(companyDetails != null){
+    //   const newCompnay = await Company(companyDetails) 
+    //    newCompnay.save();
+    // }
     
     res.status(201).json({
       message: "Job created successfully",

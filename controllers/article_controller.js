@@ -1,4 +1,5 @@
 const Article = require('../models/article');
+const News = require('../models/News');
 
 exports.createArticle = async (req, res) => {
   try {
@@ -129,5 +130,45 @@ exports.getMyArticles = async (req, res) => {
     res.json({ message: 'My articles', articles });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.getNews = async (req, res) => {
+  try {
+    const {
+      category = 'technology',
+      lang = 'en',
+      country = 'in',
+      max = 100
+    } = req.query;
+
+    const apiKey = '0c4ab980caa2fc930ea7e95321cd2b9a';
+    const gnewsUrl = `https://gnews.io/api/v4/top-headlines?category=${category}&lang=${lang}&country=${country}&max=${max}&apikey=${apiKey}`;
+
+    console.log(`Requesting: ${gnewsUrl}`);
+
+    const response = await axios.get(gnewsUrl);
+
+    if (!response.data || !Array.isArray(response.data.articles)) {
+      throw new Error('Invalid response from GNews API');
+    }
+
+    const techArticles = response.data.articles;
+
+    await News.insertMany(techArticles);
+
+    res.status(200).json({
+      message: 'News synced successfully',
+      totalFetched: techArticles.length,
+      usedUrl: gnewsUrl
+    });
+
+  } catch (error) {
+    console.error('News Sync Error:', error);
+    res.status(500).json({
+      error: 'News sync failed',
+      message: error.message,
+      stack: error.stack
+    });
   }
 };

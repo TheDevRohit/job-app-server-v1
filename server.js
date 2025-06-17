@@ -18,6 +18,7 @@ const articleRoute = require('./routes/article')
 const notificationRoutes = require('./routes/notification_route');
 const companyRoute = require('./routes/compnay_routes')
 const bannerRoute = require('./routes/banner_route')
+const adminRoute = require('./routes/admin_dashboard')
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -36,7 +37,7 @@ app.use('/api/notifications' , notificationRoutes)
 app.use('/api/article' , articleRoute)
 app.use('/api/company', companyRoute)
 app.use('/api/banner'  ,bannerRoute )
-
+app.use('/api/admin' , adminRoute)
 // Default route
 app.get('/', (req, res) => {
   res.send('Job search API is running');

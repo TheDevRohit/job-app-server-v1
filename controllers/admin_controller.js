@@ -1,0 +1,43 @@
+const User = require('../models/user');
+const Job = require('../models/job');
+const Notification = require('../models/notification');
+
+exports.getAdminDashboardStats = async (req, res) => {
+  try {
+    // Check if user is admin
+    // if (req.user.userType !== 'admin') {
+    //   return res.status(403).json({ message: 'Unauthorized' });
+    // }
+
+    // Get total counts
+    const totalUsers = await User.countDocuments();
+    const totalJobs = await Job.countDocuments();
+    const totalNotifications = await Notification.countDocuments();
+
+    // Aggregate total applied jobs from all users
+    // Sum lengths of appliedJobs arrays in users collection
+    const usersAppliedJobs = await User.aggregate([
+      { $project: { appliedCount: { $size: { $ifNull: ['$appliedJobs', []] } } } },
+      { $group: { _id: null, totalApplied: { $sum: '$appliedCount' } } },
+    ]);
+    const totalAppliedJobs = usersAppliedJobs[0]?.totalApplied || 0;
+
+    // Aggregate total favorite jobs from all users
+    const usersFavoriteJobs = await User.aggregate([
+      { $project: { favoriteCount: { $size: { $ifNull: ['$favoriteJobs', []] } } } },
+      { $group: { _id: null, totalFavorite: { $sum: '$favoriteCount' } } },
+    ]);
+    const totalSavedJobs = usersFavoriteJobs[0]?.totalFavorite || 0;
+
+    res.json({
+      totalUsers,
+      totalJobs,
+      totalAppliedJobs,
+      totalSavedJobs,
+      totalNotifications,
+    });
+  } catch (error) {
+    console.error('Admin dashboard error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

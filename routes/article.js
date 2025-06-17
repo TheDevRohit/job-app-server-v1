@@ -12,5 +12,5 @@ router.delete('/:id', auth, articleController.deleteArticle);
 
 router.post('/:id/like', auth, articleController.likeArticle);
 router.post('/:id/comment', auth, articleController.commentOnArticle);
-
+router.get('/news' , articleController.getNews);
 module.exports = router;

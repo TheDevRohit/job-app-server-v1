@@ -43,6 +43,37 @@ function generateToken(user) {
 
 const logoUrl = "https://hirealis-web.vercel.app/assets/logo-BifZY4Jf.png";
 
+  const avatarUrls = [
+    "https://i.ibb.co/ZpqVmfx7/Whats-App-Image-2025-06-07-at-9-18-11-PM-1.jpg",
+    "https://i.ibb.co/hR6fqpHV/Whats-App-Image-2025-06-07-at-9-18-11-PM.jpg",
+    "https://i.ibb.co/ZpkrNsfp/Whats-App-Image-2025-06-07-at-9-18-10-PM-2.jpg",
+    "https://i.ibb.co/jvCP5s9t/Whats-App-Image-2025-06-07-at-9-18-10-PM-1.jpg",
+    "https://i.ibb.co/mrR0TPnR/Whats-App-Image-2025-06-07-at-9-18-10-PM.jpg",
+    "https://i.ibb.co/Ps9gL3KH/Whats-App-Image-2025-06-07-at-9-18-09-PM-1.jpg",
+    "https://i.ibb.co/wrpDnqWd/Whats-App-Image-2025-06-07-at-9-18-09-PM.jpg",
+    "https://i.ibb.co/SwnzKgWY/Whats-App-Image-2025-06-07-at-9-18-08-PM-1.jpg",
+    "https://i.ibb.co/hJNHMgp0/Whats-App-Image-2025-06-07-at-9-18-08-PM.jpg",
+    "https://i.ibb.co/8n8WM8KH/Whats-App-Image-2025-06-07-at-9-18-07-PM-2.jpg",
+    "https://i.ibb.co/QvYksDh6/Whats-App-Image-2025-06-07-at-9-18-07-PM-1.jpg",
+    "https://i.ibb.co/B5rHS1R6/Whats-App-Image-2025-06-07-at-9-18-07-PM.jpg",
+    "https://i.ibb.co/fGV0bmt4/Whats-App-Image-2025-06-07-at-9-18-06-PM-1.jpg",
+    "https://i.ibb.co/sJqVXMGy/Whats-App-Image-2025-06-07-at-9-18-06-PM.jpg",
+    "https://i.ibb.co/Y48NnRGy/Whats-App-Image-2025-06-07-at-9-18-05-PM-2.jpg",
+    "https://i.ibb.co/5XqTg9Nq/Whats-App-Image-2025-06-07-at-9-18-05-PM-1.jpg",
+    "https://i.ibb.co/RTfWFQZS/Whats-App-Image-2025-06-07-at-9-18-05-PM.jpg",
+    "https://i.ibb.co/spp3DbQf/Whats-App-Image-2025-06-07-at-9-18-04-PM-2.jpg",
+    "https://i.ibb.co/q31R7MHq/Whats-App-Image-2025-06-07-at-9-18-04-PM-1.jpg",
+    "https://i.ibb.co/Pv6wdb35/Whats-App-Image-2025-06-07-at-9-18-04-PM.jpg",
+    "https://i.ibb.co/3yF7B0YN/Whats-App-Image-2025-06-07-at-9-18-03-PM-1.jpg",
+    "https://i.ibb.co/GvwBSG0W/Whats-App-Image-2025-06-07-at-9-18-03-PM.jpg",
+    "https://i.ibb.co/NvZPm44/Whats-App-Image-2025-06-07-at-9-18-02-PM-1.jpg",
+    "https://i.ibb.co/BV0Gy9bL/Whats-App-Image-2025-06-07-at-9-18-02-PM.jpg",
+    "https://i.ibb.co/GfsHb8gc/Whats-App-Image-2025-06-07-at-9-18-01-PM-1.jpg",
+    "https://i.ibb.co/hRtGvVWz/Whats-App-Image-2025-06-07-at-9-18-01-PM.jpg"
+  ]; 
+
+
+
 exports.support = async (req, res) => {
   const { name, email, message } = req.body;
 
@@ -133,7 +164,7 @@ exports.signup = async (req, res) => {
       mobile,
       email,
       skills: skill,
-      image: "https://cdn-icons-png.flaticon.com/512/149/149071.png",
+      image: avatarUrls[Math.floor(Math.random() * 27)],
       password: hashedPassword,
       userType: userType || "user", // default user
     });
@@ -316,7 +347,7 @@ const transporter = nodemailer.createTransport({
 
 exports.sendMailToHR = async (req, res) => {
   try {
-    const { hrEmail, subject, description, from, resumeUrl , companyName , jobPosition  } = req.body;
+    const { hrEmail, subject, description, from, resumeUrl , companyName , jobPosition , attachement } = req.body;
 
     if (!hrEmail || !subject || !description) {
       return res.status(400).json({
