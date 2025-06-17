@@ -45,9 +45,9 @@ exports.getAdminDashboardStats = async (req, res) => {
 
 exports.getAllUsers = async (req, res) => {
   try {
-    if (req.user.userType !== 'admin') {
-      return res.status(403).json({ message: 'Unauthorized' });
-    }
+    // if (req.user.userType !== 'admin') {
+    //   return res.status(403).json({ message: 'Unauthorized' });
+    // }
 
     const users = await User.find({}, '-password').lean(); // exclude password
     res.json({ users });
