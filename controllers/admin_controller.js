@@ -4,10 +4,9 @@ const Notification = require('../models/notification');
 
 exports.getAdminDashboardStats = async (req, res) => {
   try {
-    // Check if user is admin
-    // if (req.user.userType !== 'admin') {
-    //   return res.status(403).json({ message: 'Unauthorized' });
-    // }
+    if (req.user.userType !== 'admin') {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
 
     // Get total counts
     const totalUsers = await User.countDocuments();
@@ -40,4 +39,61 @@ exports.getAdminDashboardStats = async (req, res) => {
     console.error('Admin dashboard error:', error);
     res.status(500).json({ message: 'Server error' });
   }
+  
 };
+
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    if (req.user.userType !== 'admin') {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    const users = await User.find({}, '-password').lean(); // exclude password
+    res.json({ users });
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.getAllNotifications = async (req, res) => {
+  try {
+    if (req.user.userType !== 'admin') {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    const notifications = await Notification.find({}).lean();
+    res.json({ notifications });
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
+exports.getAllAppliedJobs = async (req, res) => {
+  try {
+    if (req.user.userType !== 'admin') {
+      return res.status(403).json({ message: 'Unauthorized' });
+    }
+
+    // Get all users with appliedJobs field only
+    const users = await User.find({}, 'appliedJobs').lean();
+
+    // Flatten all appliedJobs IDs
+    const allAppliedJobIds = users.flatMap(user => user.appliedJobs || []).map(id => id.toString());
+
+    // Get unique IDs
+    const uniqueAppliedJobIds = [...new Set(allAppliedJobIds)];
+
+    // Fetch job details
+    const appliedJobs = await Job.find({ _id: { $in: uniqueAppliedJobIds } }).lean();
+
+    res.json({ appliedJobs });
+  } catch (error) {
+    console.error('Error fetching applied jobs:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+

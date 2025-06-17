@@ -2,6 +2,8 @@ const Job = require('../models/job');
 const User = require('../models/user');
 const Company = require('../models/company')
 const Notification = require("../models/notification");
+
+
 exports.createJob = async (req, res) => {
   try {
     const {
