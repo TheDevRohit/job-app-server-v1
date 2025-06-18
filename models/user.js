@@ -8,7 +8,6 @@ const userSchema = new mongoose.Schema({
   password: { type: String }, // Optional if using social login
   image: {
     type: String,
-    default: 'https://cdn-icons-png.flaticon.com/512/149/149071.png'
   },
   provider: {
     type: String,
